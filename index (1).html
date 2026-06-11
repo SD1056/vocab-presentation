@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 단어장 — 발표</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-dark:    #1C2B3A;
+  --bg-card:    #243447;
+  --bg-light:   #F4F5F7;
+  --bg-white:   #FFFFFF;
+  --primary:    #2C5F8A;
+  --primary-lt: #3A7CA5;
+  --accent:     #4A7C6F;
+  --muted:      #7B90A0;
+  --text-white: #FFFFFF;
+  --text-dark:  #1F2937;
+  --text-gray:  #6B7280;
+  --border:     rgba(255,255,255,0.08);
+}
+
+html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', Arial, sans-serif; }
+
+/* ── Slide container ── */
+#deck { width: 100vw; height: 100vh; position: relative; }
+
+.slide {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: none;
+  overflow: hidden;
+}
+.slide.active { display: flex; flex-direction: column; }
+
+/* ── Progress bar ── */
+#progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--primary-lt); transition: width .4s ease; z-index: 100; }
+
+/* ── Nav ── */
+#nav {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 16px; z-index: 100;
+  background: rgba(28,43,58,0.85); backdrop-filter: blur(8px);
+  padding: 10px 20px; border-radius: 40px; border: 1px solid var(--border);
+}
+#nav button {
+  background: none; border: none; color: #aaa; cursor: pointer;
+  font-size: 18px; padding: 4px 10px; border-radius: 6px; transition: color .15s, background .15s;
+}
+#nav button:hover { color: #fff; background: rgba(255,255,255,0.08); }
+#slide-counter { color: #aaa; font-size: 13px; min-width: 52px; text-align: center; }
+#dots { display: flex; gap: 6px; align-items: center; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.25); cursor: pointer; transition: background .2s, transform .2s; }
+.dot.active { background: var(--primary-lt); transform: scale(1.3); }
+
+/* ── Common helpers ── */
+.dark  { background: var(--bg-dark); }
+.light { background: var(--bg-light); }
+
+.badge {
+  display: inline-block; padding: 4px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: .06em;
+  color: #fff; background: var(--primary);
+}
+
+.slide-body { flex: 1; padding: 48px 60px 80px; display: flex; flex-direction: column; }
+.slide-title { font-size: 36px; font-weight: 800; margin: 12px 0 28px; line-height: 1.2; }
+.dark  .slide-title { color: var(--text-white); }
+.light .slide-title { color: var(--text-dark); }
+
+/* ── Cards ── */
+.card-grid { display: grid; gap: 16px; flex: 1; }
+.card {
+  background: var(--bg-white); border-radius: 16px;
+  padding: 28px 24px; display: flex; flex-direction: column;
+  box-shadow: 0 2px 12px rgba(0,0,0,.07);
+}
+.dark .card { background: var(--bg-card); }
+.card-title { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+.dark .card-title { color: var(--text-white); }
+.card-desc  { font-size: 13px; color: var(--text-gray); line-height: 1.6; }
+.dark .card-desc  { color: var(--muted); }
+
+/* ── Slide 1: Title ── */
+#s1 { background: var(--bg-dark); justify-content: center; }
+#s1 .inner { padding: 0 64px; }
+#s1 .app-icon {
+  width: 80px; height: 80px; background: var(--primary);
+  border-radius: 20px; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #fff; letter-spacing: -.5px;
+  margin-bottom: 32px; line-height: 1.2; text-align: center;
+}
+#s1 h1 { font-size: 58px; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 14px; }
+#s1 .tagline { font-size: 18px; color: var(--primary-lt); margin-bottom: 10px; }
+#s1 .sub { font-size: 14px; color: var(--muted); }
+#s1 .badges { position: absolute; right: 60px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; }
+#s1 .badges span { display: block; padding: 10px 20px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; color: #ccc; font-size: 13px; font-weight: 600; text-align: center; }
+
+/* ── Slide 2: Vision ── */
+#s2 .vision-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; flex: 1; }
+#s2 .vision-card { background: #fff; border-radius: 16px; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+#s2 .vc-icon { font-size: 32px; margin-bottom: 16px; width: 60px; height: 60px; background: #EEF2F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+#s2 .vc-title { font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+#s2 .vc-desc  { font-size: 13px; color: var(--text-gray); line-height: 1.6; }
+#s2 .vision-banner { margin-top: 18px; background: var(--primary); border-radius: 12px; padding: 14px 24px; text-align: center; color: #fff; font-size: 14px; font-weight: 600; font-style: italic; }
+
+/* ── Slide 3: Problem/Solution ── */
+#s3 .ps-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; align-items: center; }
+#s3 .ps-prob { background: #F5EEEE; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #6B3A3A; font-weight: 500; }
+#s3 .ps-sol  { background: #EEF3F0; border-radius: 10px; padding: 12px 16px; font-size: 13px; color: #2E5C45; font-weight: 500; }
+#s3 .label-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 6px; }
+#s3 .label-row span { font-size: 11px; font-weight: 700; letter-spacing: .05em; color: var(--text-gray); padding: 0 4px; }
+
+/* ── Slide 4: WBS ── */
+#s4 .wbs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; flex: 1; }
+#s4 .wbs-col { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.06); display: flex; flex-direction: column; }
+#s4 .wbs-head { padding: 14px 10px; text-align: center; color: #fff; }
+#s4 .wbs-head .num { font-size: 22px; font-weight: 800; }
+#s4 .wbs-head .title { font-size: 13px; font-weight: 700; margin-top: 2px; }
+#s4 .wbs-items { padding: 12px 10px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+#s4 .wbs-item { background: #F4F5F7; border-radius: 8px; padding: 8px 10px; font-size: 12px; color: var(--text-dark); text-align: center; }
+
+/* ── Slide 5: Tech stack ── */
+#s5 .tech-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; }
+#s5 .tech-card { background: var(--bg-card); border-radius: 14px; padding: 22px 20px; }
+#s5 .tech-name { font-size: 15px; font-weight: 700; color: var(--primary-lt); margin-bottom: 10px; }
+#s5 .tech-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+/* ── Slide 6: Architecture ── */
+#s6 .arch-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+#s6 .layer { background: var(--bg-card); border-radius: 12px; padding: 18px 20px; margin-bottom: 10px; }
+#s6 .layer-name { font-size: 13px; font-weight: 700; color: var(--primary-lt); }
+#s6 .layer-sub  { font-size: 12px; color: var(--muted); margin-top: 4px; }
+#s6 .arrow { text-align: center; color: var(--muted); font-size: 16px; margin: 2px 0; }
+#s6 .code-block { background: #111C26; border-radius: 14px; padding: 22px 20px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8; flex: 1; }
+#s6 .code-block .d-root    { color: #F0C05A; }
+#s6 .code-block .d-main    { color: #6FBCF0; }
+#s6 .code-block .d-folder  { color: #7AA5C8; }
+#s6 .code-block .d-file    { color: #8B9EB0; }
+
+/* ── Slide 7: Features ── */
+#s7 .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; }
+#s7 .feat-card { background: #fff; border-radius: 14px; padding: 24px 18px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+#s7 .feat-icon { width: 48px; height: 48px; background: #EEF2F6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-size: 20px; font-weight: 800; color: var(--primary); }
+#s7 .feat-title { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+#s7 .feat-desc  { font-size: 12px; color: var(--text-gray); line-height: 1.5; }
+
+/* ── Slide 8: SRS ── */
+#s8 .rate-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+#s8 .rate-card { border-radius: 14px; padding: 20px; text-align: center; }
+#s8 .rate-label { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+#s8 .rate-desc  { font-size: 13px; color: rgba(255,255,255,.75); line-height: 1.5; }
+#s8 .srs-steps { display: flex; gap: 0; align-items: center; }
+#s8 .srs-step { flex: 1; text-align: center; }
+#s8 .srs-circle { width: 56px; height: 56px; border-radius: 50%; background: var(--primary); margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+#s8 .srs-lv { font-size: 11px; color: var(--muted); }
+#s8 .srs-arrow { color: var(--muted); font-size: 18px; flex: 0 0 auto; padding: 0 4px; margin-bottom: 22px; }
+
+/* ── Slide 9: ADR ── */
+#s9 .adr-list { display: flex; flex-direction: column; gap: 14px; flex: 1; }
+#s9 .adr-card { background: #fff; border-radius: 14px; padding: 20px 22px; display: flex; gap: 18px; align-items: flex-start; box-shadow: 0 2px 10px rgba(0,0,0,.06); }
+#s9 .adr-num { flex-shrink: 0; width: 72px; height: 72px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; text-align: center; line-height: 1.3; }
+#s9 .adr-body {}
+#s9 .adr-title { font-size: 15px; font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+#s9 .adr-detail { font-size: 12px; color: var(--text-gray); line-height: 1.6; }
+#s9 .adr-detail strong { color: var(--primary); }
+
+/* ── Slide 10: Dev Env ── */
+#s10 .devenv-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; flex: 1; }
+#s10 .env-table { width: 100%; border-collapse: collapse; }
+#s10 .env-table tr:nth-child(odd) td { background: #F4F5F7; }
+#s10 .env-table td { padding: 10px 14px; font-size: 13px; border-radius: 0; }
+#s10 .env-table td:first-child { font-weight: 700; color: var(--text-gray); width: 110px; border-radius: 8px 0 0 8px; }
+#s10 .env-table td:last-child  { color: var(--text-dark); border-radius: 0 8px 8px 0; }
+#s10 .step-list { display: flex; flex-direction: column; gap: 10px; }
+#s10 .step { display: flex; gap: 14px; align-items: flex-start; }
+#s10 .step-num { width: 28px; height: 28px; border-radius: 50%; background: var(--primary); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+#s10 .step-title { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+#s10 .step-desc  { font-size: 12px; color: var(--text-gray); margin-top: 2px; }
+#s10 h3 { font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 12px; }
+
+/* ── Slide 11: Test ── */
+#s11 .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; flex: 1; }
+#s11 .test-card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.06); display: flex; flex-direction: column; }
+#s11 .test-head { padding: 16px 20px; color: #fff; }
+#s11 .test-head h3 { font-size: 14px; font-weight: 700; }
+#s11 .test-items { padding: 16px 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+#s11 .test-item { display: flex; gap: 8px; align-items: flex-start; font-size: 12px; color: var(--text-dark); line-height: 1.4; }
+#s11 .test-item::before { content: "v"; font-weight: 800; color: var(--primary); flex-shrink: 0; }
+
+/* ── Slide 12: Demo ── */
+#s12 { background: var(--bg-dark); }
+#s12 .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; }
+#s12 .video-placeholder { background: #111C26; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; border: 2px dashed rgba(255,255,255,.15); }
+#s12 .play-btn { width: 64px; height: 64px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+#s12 .play-btn::after { content: ''; border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px; }
+#s12 .video-label { font-size: 14px; color: var(--muted); }
+#s12 .video-hint  { font-size: 11px; color: rgba(255,255,255,.3); }
+#s12 .scenario-list { display: flex; flex-direction: column; gap: 10px; }
+#s12 .scenario-item { background: var(--bg-card); border-radius: 10px; padding: 12px 16px; display: flex; gap: 14px; align-items: center; }
+#s12 .sc-time  { font-size: 12px; font-weight: 700; color: var(--primary-lt); min-width: 52px; }
+#s12 .sc-label { font-size: 13px; color: #ddd; }
+#s12 .sc-head  { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 10px; }
+
+/* ── Slide 13: Closing ── */
+#s13 { background: var(--bg-dark); }
+#s13 .future-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+#s13 .future-card { background: var(--bg-card); border-radius: 14px; padding: 20px 16px; }
+#s13 .future-icon { font-size: 11px; font-weight: 700; color: var(--primary-lt); letter-spacing: .04em; margin-bottom: 10px; }
+#s13 .future-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+#s13 .future-desc  { font-size: 12px; color: var(--muted); line-height: 1.5; }
+#s13 .github-bar { background: #0D1117; border-radius: 12px; padding: 16px 22px; display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+#s13 .github-bar .gh-label { font-size: 13px; font-weight: 700; color: #fff; }
+#s13 .github-bar .gh-cmd   { font-family: 'Courier New', monospace; font-size: 12px; color: #7AA5C8; }
+#s13 .closing-msg { text-align: center; font-size: 18px; font-style: italic; color: var(--primary-lt); }
+
+/* ── Keyboard hint ── */
+#hint { position: fixed; top: 20px; right: 24px; font-size: 11px; color: rgba(255,255,255,.3); z-index: 100; }
+
+/* ── Animations ── */
+.slide.active .slide-body > * { animation: fadeUp .45s ease both; }
+.slide.active .slide-body > *:nth-child(1) { animation-delay: .05s; }
+.slide.active .slide-body > *:nth-child(2) { animation-delay: .12s; }
+.slide.active .slide-body > *:nth-child(3) { animation-delay: .20s; }
+.slide.active .slide-body > *:nth-child(4) { animation-delay: .28s; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="hint">← → 키 또는 클릭으로 이동</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 1: TITLE -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s1" class="slide dark active" style="justify-content:center; position:relative;">
+  <div class="inner" style="padding:0 64px;">
+    <div class="app-icon">VOC<br>AB</div>
+    <h1>오늘의 단어장</h1>
+    <p class="tagline">망각 곡선 기반 · 일상 영단어 1500개 · 스마트 복습</p>
+    <div style="width:200px; height:3px; background:var(--primary); margin:16px 0;"></div>
+    <p class="sub">Flutter 크로스 플랫폼 모바일 앱</p>
+  </div>
+  <div class="badges">
+    <span>Flutter</span>
+    <span>Dart</span>
+    <span>SRS 알고리즘</span>
+    <span>TTS</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 2: VISION -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s2" class="slide light">
+  <div class="slide-body">
+    <span class="badge">VISION</span>
+    <h2 class="slide-title">우리는 왜 단어 공부를 포기할까?</h2>
+    <div class="vision-cards">
+      <div class="vision-card">
+        <div class="vc-icon" style="font-size:22px; color:#6B3A3A;">X</div>
+        <div class="vc-title">반복이 지루하다</div>
+        <div class="vc-desc">매일 같은 방식의<br>암기는 금방 지친다</div>
+      </div>
+      <div class="vision-card">
+        <div class="vc-icon" style="font-size:22px; color:#6B3A3A;">X</div>
+        <div class="vc-title">망각은 빠르다</div>
+        <div class="vc-desc">학습 후 24시간 내<br>70%를 잊어버린다</div>
+      </div>
+      <div class="vision-card">
+        <div class="vc-icon" style="font-size:22px; color:#6B3A3A;">X</div>
+        <div class="vc-title">앱이 불편하다</div>
+        <div class="vc-desc">복잡한 UI, 불필요한<br>기능에 피로감을 느낀다</div>
+      </div>
+    </div>
+    <div class="vision-banner">
+      "매일 10분, 과학적 방법으로 — 누구나 영어 단어를 꾸준히 기억할 수 있다"
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 3: PROBLEM → SOLUTION -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s3" class="slide light">
+  <div class="slide-body">
+    <span class="badge" style="background:#6B4A4A;">PROBLEM → SOLUTION</span>
+    <h2 class="slide-title">문제를 과학으로 해결하다</h2>
+    <div class="label-row">
+      <span>문제</span>
+      <span>해결</span>
+    </div>
+    <div class="ps-row"><div class="ps-prob">X  학습해도 금방 잊는다</div><div class="ps-sol">O  SRS 알고리즘으로 최적 복습 타이밍 자동 계산</div></div>
+    <div class="ps-row"><div class="ps-prob">X  어떤 단어부터 할지 모른다</div><div class="ps-sol">O  1500개 일상 영단어 + 난이도별(초·중·고급) 분류</div></div>
+    <div class="ps-row"><div class="ps-prob">X  발음을 확인하기 어렵다</div><div class="ps-sol">O  TTS(Text-to-Speech) 버튼으로 즉시 발음 청취</div></div>
+    <div class="ps-row"><div class="ps-prob">X  내 학습 현황을 모른다</div><div class="ps-sol">O  정답률, 주간 통계, 오답 TOP5 대시보드 제공</div></div>
+    <div class="ps-row"><div class="ps-prob">X  단조로운 학습에 지친다</div><div class="ps-sol">O  플래시카드 + 객관식/주관식 퀴즈 3가지 모드</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 4: WBS -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s4" class="slide light">
+  <div class="slide-body">
+    <span class="badge" style="background:var(--primary-lt);">WBS</span>
+    <h2 class="slide-title">프로젝트 작업 분류 체계</h2>
+    <div class="wbs-grid">
+      <div class="wbs-col">
+        <div class="wbs-head" style="background:#4A6B8A;"><div class="num">1</div><div class="title">기획</div></div>
+        <div class="wbs-items">
+          <div class="wbs-item">요구사항 분석</div>
+          <div class="wbs-item">기능 정의</div>
+          <div class="wbs-item">UI 와이어프레임</div>
+        </div>
+      </div>
+      <div class="wbs-col">
+        <div class="wbs-head" style="background:#3A7CA5;"><div class="num">2</div><div class="title">설계</div></div>
+        <div class="wbs-items">
+          <div class="wbs-item">아키텍처 설계</div>
+          <div class="wbs-item">DB 스키마</div>
+          <div class="wbs-item">ADR 작성</div>
+        </div>
+      </div>
+      <div class="wbs-col">
+        <div class="wbs-head" style="background:#2C5F8A;"><div class="num">3</div><div class="title">개발</div></div>
+        <div class="wbs-items">
+          <div class="wbs-item">모델/서비스</div>
+          <div class="wbs-item">화면 구현</div>
+          <div class="wbs-item">SRS 로직</div>
+        </div>
+      </div>
+      <div class="wbs-col">
+        <div class="wbs-head" style="background:#4A7C6F;"><div class="num">4</div><div class="title">테스트</div></div>
+        <div class="wbs-items">
+          <div class="wbs-item">단위 테스트</div>
+          <div class="wbs-item">통합 테스트</div>
+          <div class="wbs-item">UI 테스트</div>
+        </div>
+      </div>
+      <div class="wbs-col">
+        <div class="wbs-head" style="background:#6B5C7A;"><div class="num">5</div><div class="title">배포</div></div>
+        <div class="wbs-items">
+          <div class="wbs-item">APK 빌드</div>
+          <div class="wbs-item">GitHub 배포</div>
+          <div class="wbs-item">README 작성</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 5: TECH STACK -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s5" class="slide dark">
+  <div class="slide-body">
+    <span class="badge">TECH STACK</span>
+    <h2 class="slide-title" style="color:#fff;">적용 기술</h2>
+    <div class="tech-grid">
+      <div class="tech-card"><div class="tech-name">Flutter 3.38</div><div class="tech-desc">크로스 플랫폼 UI 프레임워크.<br>Android/iOS 단일 코드베이스</div></div>
+      <div class="tech-card"><div class="tech-name">Dart 3.0</div><div class="tech-desc">Null-safety 지원 정적 타입 언어.<br>빠른 컴파일 속도</div></div>
+      <div class="tech-card"><div class="tech-name">SRS 알고리즘</div><div class="tech-desc">에빙하우스 망각곡선 기반<br>1→3→7→14→30일 간격 복습</div></div>
+      <div class="tech-card"><div class="tech-name">flutter_tts</div><div class="tech-desc">영어 발음 TTS 재생.<br>원어민 발음 즉시 청취</div></div>
+      <div class="tech-card"><div class="tech-name">fl_chart</div><div class="tech-desc">학습 통계 시각화.<br>바차트·도넛차트 구현</div></div>
+      <div class="tech-card"><div class="tech-name">SharedPreferences</div><div class="tech-desc">로컬 데이터 영구 저장.<br>서버 없이 오프라인 작동</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 6: ARCHITECTURE -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s6" class="slide dark">
+  <div class="slide-body">
+    <span class="badge" style="background:#5C5F8A;">ARCHITECTURE</span>
+    <h2 class="slide-title" style="color:#fff;">앱 구조 및 레이어 아키텍처</h2>
+    <div class="arch-wrap">
+      <div>
+        <div class="layer"><div class="layer-name">UI Layer</div><div class="layer-sub">Screens / Widgets — 화면 렌더링</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer"><div class="layer-name">Service Layer</div><div class="layer-sub">StorageService — 비즈니스 로직</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer"><div class="layer-name">Data Layer</div><div class="layer-sub">SharedPreferences — 로컬 저장소</div></div>
+        <div class="arrow">↓</div>
+        <div class="layer"><div class="layer-name">Model Layer</div><div class="layer-sub">Word / WordGroup — 데이터 클래스</div></div>
+      </div>
+      <div class="code-block">
+        <div class="d-root">lib/</div>
+        <div style="color:#8B9EB0;">├── <span class="d-main">main.dart</span></div>
+        <div style="color:#8B9EB0;">├── <span class="d-folder">theme/</span></div>
+        <div style="color:#8B9EB0;">│   └── <span class="d-file">app_theme.dart</span></div>
+        <div style="color:#8B9EB0;">├── <span class="d-folder">models/</span></div>
+        <div style="color:#8B9EB0;">│   └── <span class="d-file">word.dart</span></div>
+        <div style="color:#8B9EB0;">├── <span class="d-folder">data/</span></div>
+        <div style="color:#8B9EB0;">│   └── <span class="d-file">words_data.dart</span></div>
+        <div style="color:#8B9EB0;">├── <span class="d-folder">services/</span></div>
+        <div style="color:#8B9EB0;">│   └── <span class="d-file">storage_service.dart</span></div>
+        <div style="color:#8B9EB0;">├── <span class="d-folder">screens/</span>  <span style="color:#4A6274;">(4개)</span></div>
+        <div style="color:#8B9EB0;">└── <span class="d-folder">widgets/</span>  <span style="color:#4A6274;">(2개)</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 7: FEATURES -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s7" class="slide light">
+  <div class="slide-body">
+    <span class="badge">FEATURES</span>
+    <h2 class="slide-title">핵심 기능 6가지</h2>
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">FC</div>
+        <div class="feat-title">플래시카드</div>
+        <div class="feat-desc">3D 뒤집기 애니메이션<br>SRS 레벨 진행바 표시</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">TTS</div>
+        <div class="feat-title">발음 듣기</div>
+        <div class="feat-desc">영어 원어민 발음<br>즉시 청취 가능</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">QZ</div>
+        <div class="feat-title">퀴즈 3종</div>
+        <div class="feat-desc">객관식·주관식·오답노트<br>게임처럼 즐기는 학습</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">WB</div>
+        <div class="feat-title">단어장 관리</div>
+        <div class="feat-desc">커스텀 그룹 생성<br>이모지로 구분</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">ST</div>
+        <div class="feat-title">학습 통계</div>
+        <div class="feat-desc">정답률 도넛차트<br>주간 바차트 제공</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">SK</div>
+        <div class="feat-title">스트릭</div>
+        <div class="feat-desc">연속 학습 일수 추적<br>동기부여 유지</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 8: SRS -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s8" class="slide dark">
+  <div class="slide-body">
+    <span class="badge">HOW IT WORKS</span>
+    <h2 class="slide-title" style="color:#fff;">SRS 알고리즘 구현</h2>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">플래시카드 평가 3단계</p>
+    <div class="rate-grid">
+      <div class="rate-card" style="background:rgba(107,74,74,.5);">
+        <div class="rate-label" style="color:#D9A0A0;">↺ 다시</div>
+        <div class="rate-desc">오늘 재학습<br>Level -1</div>
+      </div>
+      <div class="rate-card" style="background:rgba(74,107,90,.5);">
+        <div class="rate-label" style="color:#A0C8B4;">— 어려움</div>
+        <div class="rate-desc">1일 후 복습<br>Level 유지</div>
+      </div>
+      <div class="rate-card" style="background:rgba(44,95,138,.5);">
+        <div class="rate-label" style="color:#7AACD9;">v 알았어</div>
+        <div class="rate-desc">1→3→7→14→30일<br>Level +1</div>
+      </div>
+    </div>
+    <p style="font-size:13px; color:var(--muted); margin-bottom:14px;">복습 간격 단계</p>
+    <div class="srs-steps">
+      <div class="srs-step"><div class="srs-circle" style="opacity:1;">오늘</div><div class="srs-lv">Lv 0</div></div>
+      <div class="srs-arrow">→</div>
+      <div class="srs-step"><div class="srs-circle" style="opacity:.88;">1일</div><div class="srs-lv">Lv 1</div></div>
+      <div class="srs-arrow">→</div>
+      <div class="srs-step"><div class="srs-circle" style="opacity:.76;">3일</div><div class="srs-lv">Lv 2</div></div>
+      <div class="srs-arrow">→</div>
+      <div class="srs-step"><div class="srs-circle" style="opacity:.64;">7일</div><div class="srs-lv">Lv 3</div></div>
+      <div class="srs-arrow">→</div>
+      <div class="srs-step"><div class="srs-circle" style="opacity:.52;">14일</div><div class="srs-lv">Lv 4</div></div>
+      <div class="srs-arrow">→</div>
+      <div class="srs-step"><div class="srs-circle" style="opacity:.4;">30일</div><div class="srs-lv">완료</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 9: ADR -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s9" class="slide light">
+  <div class="slide-body">
+    <span class="badge" style="background:#6B4A4A;">ADR / 시행착오</span>
+    <h2 class="slide-title">개발 의사결정 기록 (ADR)</h2>
+    <div class="adr-list">
+      <div class="adr-card">
+        <div class="adr-num" style="background:#4A6B8A;">ADR<br>001</div>
+        <div class="adr-body">
+          <div class="adr-title">상태 관리 : setState vs Provider</div>
+          <div class="adr-detail"><strong>결정:</strong> setState 선택 &nbsp;|&nbsp; <strong>근거:</strong> 단일 화면 위주 앱 특성상 전역 상태 관리 불필요. Provider 도입 시 오버엔지니어링 우려</div>
+        </div>
+      </div>
+      <div class="adr-card">
+        <div class="adr-num" style="background:#3A7CA5;">ADR<br>002</div>
+        <div class="adr-body">
+          <div class="adr-title">로컬 저장소 : SQLite vs SharedPreferences</div>
+          <div class="adr-detail"><strong>결정:</strong> SharedPreferences 선택 &nbsp;|&nbsp; <strong>근거:</strong> 단어 데이터는 JSON 직렬화로 충분. SQLite는 복잡도 증가 대비 이점 불명확</div>
+        </div>
+      </div>
+      <div class="adr-card">
+        <div class="adr-num" style="background:#4A7C6F;">ADR<br>003</div>
+        <div class="adr-body">
+          <div class="adr-title">단어 데이터 : API vs 로컬 하드코딩</div>
+          <div class="adr-detail"><strong>결정:</strong> 로컬 하드코딩 선택 &nbsp;|&nbsp; <strong>근거:</strong> 오프라인 환경 지원 필수. Free Dictionary API 응답 불안정성으로 UX 저하 우려</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 10: DEV ENV & BUILD -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s10" class="slide light">
+  <div class="slide-body">
+    <span class="badge" style="background:var(--primary-lt);">DEV ENV &amp; DEPLOY</span>
+    <h2 class="slide-title">개발 환경 &amp; 빌드·배포 프로세스</h2>
+    <div class="devenv-wrap">
+      <div>
+        <h3>개발 환경</h3>
+        <table class="env-table">
+          <tr><td>IDE</td><td>VS Code + Flutter Extension</td></tr>
+          <tr><td>Flutter</td><td>3.38.3 (stable channel)</td></tr>
+          <tr><td>Dart</td><td>3.0+ (Null Safety)</td></tr>
+          <tr><td>OS</td><td>Windows 11</td></tr>
+          <tr><td>테스트 기기</td><td>Samsung Galaxy S926N (Android 16)</td></tr>
+          <tr><td>에뮬레이터</td><td>Android Studio AVD</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3>빌드 &amp; 배포 단계</h3>
+        <div class="step-list">
+          <div class="step"><div class="step-num">1</div><div><div class="step-title">코드 작성</div><div class="step-desc">Dart 코드 개발 및 로컬 테스트</div></div></div>
+          <div class="step"><div class="step-num">2</div><div><div class="step-title">flutter build apk --release</div><div class="step-desc">릴리즈 APK 생성</div></div></div>
+          <div class="step"><div class="step-num">3</div><div><div class="step-title">서명 (Signing)</div><div class="step-desc">키스토어로 APK 디지털 서명</div></div></div>
+          <div class="step"><div class="step-num">4</div><div><div class="step-title">GitHub 배포</div><div class="step-desc">README + APK Releases 업로드</div></div></div>
+          <div class="step"><div class="step-num">5</div><div><div class="step-title">설치</div><div class="step-desc">직접 APK 설치 또는 Play Store</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 11: TEST -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s11" class="slide light">
+  <div class="slide-body">
+    <span class="badge">TEST &amp; QUALITY</span>
+    <h2 class="slide-title">테스트 &amp; 코드 품질 관리</h2>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-head" style="background:#4A6B8A;"><h3>단위 테스트</h3></div>
+        <div class="test-items">
+          <div class="test-item">Word.rateKnow() → srsLevel +1 확인</div>
+          <div class="test-item">Word.rateAgain() → nextReviewDays = 0</div>
+          <div class="test-item">SRS 간격 배열 경계값 테스트</div>
+          <div class="test-item">Word.toJson() / fromJson() 직렬화</div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-head" style="background:#3A7CA5;"><h3>통합 테스트</h3></div>
+        <div class="test-items">
+          <div class="test-item">StorageService 저장/불러오기 흐름</div>
+          <div class="test-item">단어 추가 → 목록 반영 확인</div>
+          <div class="test-item">퀴즈 흐름 End-to-End 검증</div>
+          <div class="test-item">스트릭 날짜 계산 로직 검증</div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-head" style="background:#4A7C6F;"><h3>UI / 수동 테스트</h3></div>
+        <div class="test-items">
+          <div class="test-item">실기기(Galaxy S926N) 화면 검증</div>
+          <div class="test-item">플래시카드 3D 애니메이션 확인</div>
+          <div class="test-item">TTS 발음 정확도 확인</div>
+          <div class="test-item">다크모드 UI 렌더링 검사</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 12: DEMO -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s12" class="slide dark">
+  <div class="slide-body">
+    <span class="badge" style="background:#5C7A5C;">DEMO</span>
+    <h2 class="slide-title" style="color:#fff;">30초 시연 데모</h2>
+    <div class="demo-wrap">
+      <div class="video-placeholder">
+        <div class="play-btn"></div>
+        <div class="video-label">시연 영상을 여기에 삽입하세요</div>
+        <video src="demo.mp4" controls autoplay muted loop
+     style="width:100%; height:100%; border-radius:16px; object-fit:cover;">
+   </video>
+      </div>
+      <div>
+        <div class="sc-head">시연 시나리오</div>
+        <div class="scenario-list">
+          <div class="scenario-item"><div class="sc-time">0-5초</div><div class="sc-label">앱 실행 &amp; 홈 화면</div></div>
+          <div class="scenario-item"><div class="sc-time">5-12초</div><div class="sc-label">플래시카드 학습 + TTS 발음</div></div>
+          <div class="scenario-item"><div class="sc-time">12-18초</div><div class="sc-label">SRS 평가 (알았어 / 다시)</div></div>
+          <div class="scenario-item"><div class="sc-time">18-24초</div><div class="sc-label">퀴즈 모드 진행</div></div>
+          <div class="scenario-item"><div class="sc-time">24-30초</div><div class="sc-label">통계 화면 확인</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SLIDE 13: CLOSING -->
+<!-- ══════════════════════════════════════════ -->
+<div id="s13" class="slide dark">
+  <div class="slide-body">
+    <span class="badge">FUTURE &amp; CLOSING</span>
+    <h2 class="slide-title" style="color:#fff;">향후 발전 방향</h2>
+    <div class="future-grid">
+      <div class="future-card"><div class="future-icon">API</div><div class="future-title">단어 API 연동</div><div class="future-desc">Free Dictionary API로 발음/예문 자동 입력</div></div>
+      <div class="future-card"><div class="future-icon">PUSH</div><div class="future-title">푸시 알림</div><div class="future-desc">복습 시간 알림 (flutter_local_notifications)</div></div>
+      <div class="future-card"><div class="future-icon">CSV</div><div class="future-title">CSV 가져오기</div><div class="future-desc">단어 일괄 import/export 기능 추가</div></div>
+      <div class="future-card"><div class="future-icon">CLOUD</div><div class="future-title">클라우드 동기화</div><div class="future-desc">Firebase로 기기 간 학습 데이터 동기화</div></div>
+    </div>
+    <div class="github-bar">
+      <div class="gh-label">GitHub 설치 가이드</div>
+      <div class="gh-cmd">git clone → cd vocab_v2 → flutter pub get → flutter run</div>
+    </div>
+    <div class="closing-msg">"매일 10분, 꾸준함이 실력이 됩니다"</div>
+  </div>
+</div>
+
+<!-- ── Navigation ── -->
+<div id="nav">
+  <button id="btn-prev" title="이전">&#8592;</button>
+  <div id="dots"></div>
+  <span id="slide-counter">1 / 13</span>
+  <button id="btn-next" title="다음">&#8594;</button>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const total  = slides.length;
+let cur = 0;
+
+const dotsEl    = document.getElementById('dots');
+const counter   = document.getElementById('slide-counter');
+const progress  = document.getElementById('progress');
+
+// Build dots
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(d);
+});
+
+function goTo(n) {
+  slides[cur].classList.remove('active');
+  dotsEl.children[cur].classList.remove('active');
+  cur = Math.max(0, Math.min(n, total - 1));
+  slides[cur].classList.add('active');
+  dotsEl.children[cur].classList.add('active');
+  counter.textContent = `${cur + 1} / ${total}`;
+  progress.style.width = `${((cur + 1) / total) * 100}%`;
+}
+
+document.getElementById('btn-prev').addEventListener('click', () => goTo(cur - 1));
+document.getElementById('btn-next').addEventListener('click', () => goTo(cur + 1));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); goTo(cur + 1); }
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')                    { e.preventDefault(); goTo(cur - 1); }
+});
+
+// Touch swipe
+let tx = 0;
+document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+document.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) goTo(dx < 0 ? cur + 1 : cur - 1);
+});
+
+// Init progress
+progress.style.width = `${(1 / total) * 100}%`;
+</script>
+</body>
+</html>
