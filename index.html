@@ -192,12 +192,31 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font
 
 /* ── Slide 12: Demo ── */
 #s12 { background: var(--bg-dark); }
-#s12 .demo-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; }
-#s12 .video-placeholder { background: #111C26; border-radius: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; border: 2px dashed rgba(255,255,255,.15); }
-#s12 .play-btn { width: 64px; height: 64px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-#s12 .play-btn::after { content: ''; border-left: 20px solid #fff; border-top: 12px solid transparent; border-bottom: 12px solid transparent; margin-left: 4px; }
-#s12 .video-label { font-size: 14px; color: var(--muted); }
-#s12 .video-hint  { font-size: 11px; color: rgba(255,255,255,.3); }
+#s12 .demo-wrap { display: grid; grid-template-columns: auto 1fr; gap: 40px; flex: 1; align-items: center; }
+#s12 .phone-frame {
+  width: 220px; height: 440px; flex-shrink: 0;
+  background: #0A0A0A; border-radius: 36px;
+  border: 6px solid #2A2A2A;
+  box-shadow: 0 0 0 1px #444, 0 24px 48px rgba(0,0,0,.6);
+  display: flex; flex-direction: column; overflow: hidden;
+  position: relative;
+}
+#s12 .phone-notch {
+  width: 70px; height: 18px; background: #0A0A0A;
+  border-radius: 0 0 14px 14px;
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2;
+}
+#s12 .phone-screen {
+  flex: 1; background: #111C26; overflow: hidden;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  position: relative; gap: 12px;
+}
+#s12 .phone-screen video { width: 100%; height: 100%; object-fit: cover; display: block; }
+#s12 .play-btn { width: 52px; height: 52px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+#s12 .play-btn::after { content: ''; border-left: 16px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 3px; }
+#s12 .video-label { font-size: 11px; color: rgba(255,255,255,.5); text-align: center; padding: 0 12px; }
+#s12 .phone-home { height: 24px; background: #0A0A0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#s12 .phone-home::after { content: ''; width: 60px; height: 4px; background: #333; border-radius: 2px; }
 #s12 .scenario-list { display: flex; flex-direction: column; gap: 10px; }
 #s12 .scenario-item { background: var(--bg-card); border-radius: 10px; padding: 12px 16px; display: flex; gap: 14px; align-items: center; }
 #s12 .sc-time  { font-size: 12px; font-weight: 700; color: var(--primary-lt); min-width: 52px; }
@@ -600,12 +619,15 @@ html, body { width: 100%; height: 100%; overflow: hidden; background: #111; font
     <span class="badge" style="background:#5C7A5C;">DEMO</span>
     <h2 class="slide-title" style="color:#fff;">30초 시연 데모</h2>
     <div class="demo-wrap">
-      <div class="video-placeholder">
-        <div class="play-btn"></div>
-        <div class="video-label">시연 영상을 여기에 삽입하세요</div>
-        <video src="demo.mp4" controls autoplay muted loop
-     style="width:100%; height:100%; border-radius:16px; object-fit:cover;">
-   </video>
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <!-- 영상 파일이 있으면 아래 video 태그 주석 해제하고 src에 파일명 입력 -->
+          <video src="demo.mp4" autoplay muted loop playsinline></video>
+          <div class="play-btn"></div>
+          <div class="video-label">demo.mp4 파일을<br>같은 폴더에 넣으세요</div>
+        </div>
+        <div class="phone-home"></div>
       </div>
       <div>
         <div class="sc-head">시연 시나리오</div>
